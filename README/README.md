@@ -29,8 +29,10 @@ gRPC
 Клиент отправляет диапазон дат, сервер возвращает поток сообщений с событиями.  
 
 ---
+## 4. Настройка окружения 
+<img width="313" height="431" alt="image" src="https://github.com/user-attachments/assets/51c34fda-2a1b-4f4b-8352-cc8d426b982b" />
 
-## 4. Листинг `.proto` файла с комментариями
+## 5. Листинг `.proto` файла с комментариями
 
 ### Файл `name.proto`
 ```python
@@ -63,7 +65,7 @@ message EventResponse {
 ```
 ---
 
-## 5. Листинг серверной части (`server.py`) с комментариями
+## 6. Листинг серверной части (`server.py`) с комментариями
 ```python
 # Импортируем библиотеку gRPC
 import grpc
@@ -124,7 +126,7 @@ if __name__ == '__main__':
 ```
 ---
 
-## 6. Листинг клиентской части (`client.py`) с комментариями
+## 7. Листинг клиентской части (`client.py`) с комментариями
 
 ```python
 # Импортируем библиотеку gRPC
@@ -163,7 +165,25 @@ if __name__ == '__main__':
 ```
 ---
 
-## 7. Скриншоты работы программы
+
+## Архитектура системы
+
+```mermaid
+flowchart LR
+
+    Client["Client (client.py)"]
+    Server["Server (server.py)"]
+
+    gRPC["gRPC Framework\n(HTTP/2 Transport)"]
+    Proto["Protocol Buffers\n(.proto → serialization)"]
+
+    Client <-->|Bidirectional Streaming RPC| gRPC
+    Server <-->|Bidirectional Streaming RPC| gRPC
+
+    gRPC --> Proto
+```
+---
+## 8. Скриншоты работы программы
 
  **Скрин терминала сервиса:**
  
@@ -175,12 +195,8 @@ if __name__ == '__main__':
 
 ---
 
-## 8. Выводы
+## 9. Выводы
 
-* Создан файл `name.proto`, описывающий сервис AnalyticsService и сообщения DateRange и EventResponse.
-* Реализован сервер с методом Server Streaming RPC, который отправляет поток событий клиенту.
-* Реализован клиент, который получает и выводит поток событий.
-* Получены практические навыки работы с gRPC, Protobuf и организации клиент-серверного взаимодействия.
-* Лабораторная работа выполнена полностью, цели достигнуты.
+* Создан файл `name.proto`, описывающий сервис AnalyticsService и сообщения DateRange и EventResponse. Реализован сервер с методом Server Streaming RPC, который отправляет поток событий клиенту. Реализован клиент, который получает и выводит поток событий. Получены практические навыки работы с gRPC, Protobuf и организации клиент-серверного взаимодействия.
 
 ```
