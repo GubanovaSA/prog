@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Максим, я тебя очень люблю!</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400&display=swap');
+
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0a1428, #1e2a4a);
+      color: white;
+      font-family: 'Roboto', sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .container {
+      text-align: center;
+      padding: 40px 20px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .heart {
+      font-size: 280px;
+      line-height: 1;
+      margin: 20px auto;
+      display: block;
+      animation: pulse 2s infinite;
+      text-shadow: 0 0 40px #ff3366;
+      filter: drop-shadow(0 0 30px #ff3366);
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.2rem;
+      margin: 10px 0 15px;
+      color: #a0d8ff;
+      text-shadow: 0 0 25px rgba(160, 216, 255, 0.6);
+    }
+
+    .subtitle {
+      font-size: 1.8rem;
+      color: #b0e0ff;
+      margin: 10px 0 40px;
+      font-weight: 300;
+    }
+
+    button {
+      padding: 16px 45px;
+      font-size: 1.4rem;
+      background: #4a9eff;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 0 30px rgba(74, 158, 255, 0.7);
+    }
+
+    button:hover {
+      transform: scale(1.1);
+      background: #5eb0ff;
+    }
+
+    /* Анимированные таксы */
+    .dachshund {
+      position: absolute;
+      font-size: 2.8rem;
+      z-index: 1;
+      pointer-events: none;
+      animation: run linear infinite;
+    }
+
+    @keyframes run {
+      from { transform: translateX(-120px); }
+      to { transform: translateX(calc(100vw + 120px)); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="heart">❤️</div>
+    
+    <h1>Максим, я тебя очень люблю!</h1>
+    <p class="subtitle">у тебя всё получится, я в тебя верю ❤️</p>
+    
+    <button onclick="launchFireworks()">Запустить салют ✨</button>
+  </div>
+
+  <canvas id="fireworks" style="position: fixed; top: 0; left: 0; z-index: 5; pointer-events: none;"></canvas>
+
+  <script>
+    // Таксы
+    function createDachshund() {
+      const d = document.createElement('div');
+      d.className = 'dachshund';
+      d.textContent = '🐕';
+      d.style.top = Math.random() * 75 + 15 + 'vh';
+      d.style.animationDuration = (Math.random() * 10 + 8) + 's';
+      document.body.appendChild(d);
+      setTimeout(() => d.remove(), 20000);
+    }
+    setInterval(createDachshund, 600);
+
+    // Салют
+    const canvas = document.getElementById('fireworks');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    let fireworks = [];
+
+    class Firework {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height;
+        this.targetY = Math.random() * (canvas.height * 0.4);
+        this.speed = 7;
+        this.hue = Math.random() * 360;
+        this.exploded = false;
+        this.particles = [];
+      }
+      update() {
+        if (!this.exploded) {
+          this.y -= this.speed;
+          if (this.y <= this.targetY) this.explode();
+        }
+      }
+      explode() {
+        this.exploded = true;
+        for (let i = 0; i < 70; i++) this.particles.push(new Particle(this.x, this.y, this.hue));
+      }
+      draw() {
+        if (!this.exploded) {
+          ctx.fillStyle = `hsl(${this.hue}, 100%, 70%)`;
+          ctx.beginPath(); ctx.arc(this.x, this.y, 4, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+    }
+
+    class Particle {
+      constructor(x, y, hue) {
+        this.x = x; this.y = y;
+        this.vx = Math.random() * 8 - 4;
+        this.vy = Math.random() * 8 - 5;
+        this.hue = hue;
+        this.life = 55;
+        this.size = Math.random() * 4 + 2;
+      }
+      update() {
+        this.x += this.vx; this.y += this.vy; this.vy += 0.18; this.life--;
+      }
+      draw() {
+        ctx.globalAlpha = this.life / 55;
+        ctx.fillStyle = `hsl(${this.hue}, 100%, 70%)`;
+        ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+
+    function launchFireworks() {
+      for (let i = 0; i < 8; i++) {
+        setTimeout(() => fireworks.push(new Firework()), i * 160);
+      }
+    }
+
+    function animate() {
+      ctx.fillStyle = 'rgba(10,20,40,0.2)';
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      
+      fireworks = fireworks.filter(f => {
+        f.update(); f.draw();
+        if (f.exploded) {
+          f.particles = f.particles.filter(p => { p.update(); p.draw(); return p.life > 0; });
+          return f.particles.length > 0;
+        }
+        return true;
+      });
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
+</body>
+</html>
